@@ -1,23 +1,53 @@
 package edu.systemanalysis.finalproject.app;
 
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.core.util.HexUtil;
 import edu.systemanalysis.finalproject.app.UserHelper;
+
+import java.security.*;
 
 public class User {
     private int id, role;
-    private String email, password, firstName, lastName;
+    private String email, password, firstName, lastName, hashPassword, salt;
 
     private UserHelper uh = UserHelper.getHelper();
 
+    /**
+     * 建立使用者
+     */
     public User(String email, String password, String first_name, String last_name, int role) {
         this.email = email;
         this.password = password;
+        this.salt = this.genSalt();
+        this.hashPassword = DigestUtil.sha256Hex(this.salt + password);
         this.firstName = first_name;
         this.lastName = last_name;
         this.role = role;
     }
 
-    public User(int id) {
-        this.id = id;
+    /**
+     * 使用者登入
+     */
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.id = uh.getIDByEmail(this.email);
+        this.salt = uh.getSaltByEmail(this.email);
+        this.hashPassword = DigestUtil.sha256Hex(this.salt + password);
+    }
+
+    public User(String email) {
+        this.email = email;
+        this.id = uh.getIDByEmail(this.email);
+        this.salt = uh.getSaltByEmail(this.email);
+        this.hashPassword = DigestUtil.sha256Hex(this.salt + password);
+    }
+
+    public String genSalt() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] salt = new byte[20];
+        secureRandom.nextBytes(salt);
+        return HexUtil.encodeHexStr(salt);
     }
 
     public int getId() {
@@ -40,8 +70,19 @@ public class User {
         return this.password;
     }
 
+    public String getHashPassword() {
+        return this.hashPassword;
+    }
+
     public String getEmail() {
         return this.email;
+    }
+
+    public String getSalt() {
+        if (this.salt.isEmpty()) {
+            this.salt = uh.getSaltByEmail(this.email);
+        }
+        return this.salt;
     }
 
     public boolean checkAttrEmpty() {
@@ -53,6 +94,14 @@ public class User {
 
     public boolean checkEmailDuplicate() {
         return uh.checkEmailDuplicate(this.email);
+    }
+
+    public boolean checkEmailExist() {
+        return uh.checkEmailExists(this.email);
+    }
+
+    public boolean checkPasswordCorrect() {
+        return this.hashPassword.equals(uh.getHashPasswordByEmail(this.email));
     }
 
     public void create() {

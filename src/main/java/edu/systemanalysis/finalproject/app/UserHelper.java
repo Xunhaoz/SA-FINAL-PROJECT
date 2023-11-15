@@ -50,13 +50,14 @@ public class UserHelper {
     public void create(User m) {
         try {
             conn = DBMgr.getConnection();
-            String sql = "INSERT INTO `final_project`.`user`(`first_name`, `last_name`, `email`, `password`, `role`)" + " VALUES(?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO `final_project`.`user`(`first_name`, `last_name`, `email`, `password`, `role`, `salt`)" + " VALUES(?, ?, ?, ?, ?, ?)";
             pres = conn.prepareStatement(sql);
             pres.setString(1, m.getFirstName());
             pres.setString(2, m.getLastName());
             pres.setString(3, m.getEmail());
-            pres.setString(4, m.getPassword());
+            pres.setString(4, m.getHashPassword());
             pres.setInt(5, m.getRole());
+            pres.setString(6, m.getSalt());
             pres.execute();
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
@@ -81,15 +82,78 @@ public class UserHelper {
                 id = rs.getInt("id");
             }
         } catch (SQLException e) {
-            /** 印出JDBC SQL指令錯誤 **/
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
         } catch (Exception e) {
-            /** 若錯誤則印出錯誤訊息 */
             e.printStackTrace();
         } finally {
-            /** 關閉連線並釋放所有資料庫相關之資源 **/
             DBMgr.close(rs, pres, conn);
         }
         return id;
+    }
+
+    public String getSaltByEmail(String email) {
+        ResultSet rs = null;
+        String salt = "";
+
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
+            pres = conn.prepareStatement(sql);
+            pres.setString(1, email);
+            rs = pres.executeQuery();
+            if (rs.next()) {
+                salt = rs.getString("salt");
+            }
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBMgr.close(rs, pres, conn);
+        }
+        return salt;
+    }
+
+    public String getHashPasswordByEmail(String email) {
+        ResultSet rs = null;
+        String hashPassword = "";
+
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
+            pres = conn.prepareStatement(sql);
+            pres.setString(1, email);
+            rs = pres.executeQuery();
+            if (rs.next()) {
+                hashPassword = rs.getString("password");
+            }
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBMgr.close(rs, pres, conn);
+        }
+        return hashPassword;
+    }
+
+    public boolean checkEmailExists(String email) {
+        ResultSet rs = null;
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
+            pres = conn.prepareStatement(sql);
+            pres.setString(1, email);
+            rs = pres.executeQuery();
+            return rs.next();
+
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBMgr.close(rs, pres, conn);
+        }
+        return false;
     }
 }
