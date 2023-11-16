@@ -27,35 +27,35 @@ public class AuthController extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
+        String authentication = request.getHeader("Authentication");
 
-        String headerValue = request.getHeader("Authentication");
-        JWT jwt = JWTUtil.parseToken(headerValue);
-        String email = jwt.getPayload("userName").toString();
-        User u = new User(email);
-
-        if (!jwt.setKey(u.getSalt().getBytes()).verify()) {
-            String resp = "{\"status\": 401, \"message\": \"jwt 登入失敗\", \"response\": \"\"}";
+        if (authentication == null || authentication.isEmpty()) {
+            String resp = "{\"status\": 403, \"message\": \"你沒有權限進入這個頁面\", \"response\": \"\"}";
             jsr.response(resp, response);
             return;
         }
 
-        JSONObject resp = new JSONObject();
-        resp.put("status", 200);
-        resp.put("message", "jwt 登入成功");
-        resp.put("response", llh.getAll(u.getId()));
+        JWT jwt = JWTUtil.parseToken(authentication);
+        String email = jwt.getPayload("userName").toString();
+
+        User u = new User(email);
+        if (!jwt.setKey(u.getSalt().getBytes()).verify()) {
+            String resp = "{\"status\": 403, \"message\": \"你沒有權限進入這個頁面\", \"response\": \"\"}";
+            jsr.response(resp, response);
+            return;
+        }
+
+        String resp = "{\"status\": 200, \"message\": \"進入頁面成功\", \"response\": \"\"}";
         jsr.response(resp, response);
     }
 
-    /**
-     * 登入驗證
-     */
+
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
         JSONObject jso = jsr.getObject();
 
         String email = jso.getString("email");
         String password = jso.getString("password");
-        boolean remember = jso.getBoolean("remember");
 
         User u = new User(email);
 
@@ -64,25 +64,25 @@ public class AuthController extends HttpServlet {
             jsr.response(resp, response);
             return;
         }
+
         if (!u.checkPasswordCorrect(password)) {
             String resp = "{\"status\": 401, \"message\": '密碼不正確', 'response': ''}";
             jsr.response(resp, response);
             return;
         }
-        if (remember) {
-            String salt = u.getSalt();
-            DateTime now = DateTime.now();
-            DateTime newTime = now.offset(DateField.MINUTE, 10);
 
-            Map<String, Object> payload = new HashMap<String, Object>();
-            payload.put(JWTPayload.ISSUED_AT, now);
-            payload.put(JWTPayload.EXPIRES_AT, newTime);
-            payload.put(JWTPayload.NOT_BEFORE, now);
-            payload.put("userName", email);
-            String token = JWTUtil.createToken(payload, salt.getBytes());
-            Cookie cookie = new Cookie("Authentication", token);
-            response.addCookie(cookie);
-        }
+        String salt = u.getSalt();
+        DateTime now = DateTime.now();
+        DateTime newTime = now.offset(DateField.MINUTE, 10);
+
+        Map<String, Object> payload = new HashMap<String, Object>();
+        payload.put(JWTPayload.ISSUED_AT, now);
+        payload.put(JWTPayload.EXPIRES_AT, newTime);
+        payload.put(JWTPayload.NOT_BEFORE, now);
+        payload.put("userName", email);
+        String token = JWTUtil.createToken(payload, salt.getBytes());
+        Cookie cookie = new Cookie("Authentication", token);
+        response.addCookie(cookie);
 
         String ip = jso.getString("ip");
         String city = jso.getString("city");

@@ -418,7 +418,7 @@
             <div class="modal-body">如果確定要離開的話，請選擇下方「登出」按鈕</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">取消</button>
-                <a class="btn btn-primary" href="../../../../../Desktop/front-end/login.html">登出</a>
+                <a class="btn btn-primary" id="logout" href="#">登出</a>
             </div>
         </div>
     </div>
@@ -441,6 +441,63 @@
 <script src="js/demo/chart-area-demo.js"></script>
 <script src="js/demo/chart-pie-demo.js"></script>
 
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var $form = $('#logout');
+        $form.click(function () {
+            clearCookie("Authentication");
+        });
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) === 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+        function clearCookie(name) {
+            setCookie(name, "", -1);
+            window.location.href = "login.html"
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "auth",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if (response.status === 403) {
+                    alert(response.message)
+                    window.location.href = "login.html";
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

@@ -32,15 +32,15 @@ public class LoginLogController extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
-        String emailString = request.getHeader("email");
-
-        User u = new User(emailString);
+        String headerValue = request.getHeader("Authentication");
+        JWT jwt = JWTUtil.parseToken(headerValue);
+        String email = jwt.getPayload("userName").toString();
+        User u = new User(email);
 
         JSONObject resp = new JSONObject();
         resp.put("status", 200);
-        resp.put("message", "資料獲取成功");
+        resp.put("message", "登入資料獲取成功");
         resp.put("response", llh.getAll(u.getId()));
-
         jsr.response(resp, response);
     }
 

@@ -344,23 +344,25 @@
 <script src="js/demo/datatables-demo.js"></script>
 
 <script type="text/javascript">
-    $(document).ready(function () {
 
+
+    $(document).ready(function () {
         function getCookie(cname) {
             let name = cname + "=";
             let decodedCookie = decodeURIComponent(document.cookie);
             let ca = decodedCookie.split(';');
             for (let i = 0; i < ca.length; i++) {
                 let c = ca[i];
-                while (c.charAt(0) == ' ') {
+                while (c.charAt(0) === ' ') {
                     c = c.substring(1);
                 }
-                if (c.indexOf(name) == 0) {
+                if (c.indexOf(name) === 0) {
                     return c.substring(name.length, c.length);
                 }
             }
             return "";
         }
+
 
         $.ajax({
             type: "GET",
@@ -371,10 +373,29 @@
             dataType: 'json',
             timeout: 5000,
             success: function (response) {
+                if (response.status === 403) {
+                    alert(response.message)
+                    window.location.href = "login.html";
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: "log",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
                 if (response.status === 200) {
                     var tbody = $("#tbody");
                     $.each(response.response.data, function (index, item) {
-                        console.log(item);
                         var row = $("<tr>");
                         row.append($("<td>").text(item.ip));
                         row.append($("<td>").text(item.create_time));
@@ -383,7 +404,6 @@
                         row.append($("<td>").text(item.operating_system));
                         tbody.prepend(row);
                     });
-
                 } else {
                     alert("資料獲取失敗" + response.message);
                 }

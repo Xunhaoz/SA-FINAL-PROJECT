@@ -11,7 +11,6 @@ import edu.systemanalysis.finalproject.app.User;
 import edu.systemanalysis.finalproject.tools.JsonReader;
 
 
-
 @WebServlet(name = "user", value = "/user")
 public class UserController extends HttpServlet {
     public void init() {
@@ -20,21 +19,15 @@ public class UserController extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
-
         String headerValue = request.getHeader("Authentication");
         JWT jwt = JWTUtil.parseToken(headerValue);
+
         String email = jwt.getPayload("userName").toString();
         User u = new User(email);
 
-        if (!jwt.setKey(u.getSalt().getBytes()).verify()) {
-            String resp = "{\"status\": 401, \"message\": \"jwt 登入失敗\", \"response\": \"\"}";
-            jsr.response(resp, response);
-            return;
-        }
-
         JSONObject resp = new JSONObject();
         resp.put("status", 200);
-        resp.put("message", "jwt 登入成功");
+        resp.put("message", "登入成功");
         resp.put("response", u.getData());
         jsr.response(resp, response);
     }
@@ -64,6 +57,12 @@ public class UserController extends HttpServlet {
             return;
         }
 
+        if (!password.equals(repeatPassword)) {
+            String resp = "{\"status\": 400, \"message\": '驗證密碼不確', 'response': ''}";
+            jsr.response(resp, response);
+            return;
+        }
+
         u.create();
         String resp = "{\"status\": 200, \"message\": \"註冊成功！！\", 'response': ''}";
         jsr.response(resp, response);
@@ -79,9 +78,11 @@ public class UserController extends HttpServlet {
         String email = jwt.getPayload("userName").toString();
 
         User u = new User(email);
-        u.setPassword(jso.getString("password"));
-        u.setFirstName(jso.getString("first_name"));
-        u.setLastName(jso.getString("last_name"));
+        if (!jso.getString("email").isEmpty()) u.setEmail(jso.getString("email"));
+        if (!jso.getString("password").isEmpty()) u.setPassword(jso.getString("password"));
+        if (!jso.getString("first_name").isEmpty()) u.setFirstName(jso.getString("first_name"));
+        if (!jso.getString("last_name").isEmpty()) u.setLastName(jso.getString("last_name"));
+
         u.setRole(jso.getInt("role"));
         u.update();
 

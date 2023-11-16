@@ -234,7 +234,7 @@
                                 活動紀錄
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <a class="dropdown-item" id="logout" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 登出
                             </a>
@@ -258,7 +258,19 @@
                         <h6 class="m-0 font-weight-bold text-primary">個人資料修改</h6>
                     </div>
                     <div class="card-body">
-
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <div class="p-2">
+                                        <label class="text-lg text-primary">Email</label>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-user"
+                                                   aria-describedby="emailHelp" placeholder="Chang" id="email">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
@@ -266,7 +278,7 @@
                                         <label class="text-lg text-primary">姓</label>
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
-                                                   aria-describedby="emailHelp" placeholder="Chang">
+                                                   aria-describedby="emailHelp" placeholder="Chang" id="last_name">
                                         </div>
                                     </div>
                                 </div>
@@ -279,7 +291,7 @@
                                         <label class="text-lg text-primary">名</label>
                                         <div class="form-group">
                                             <input type="text" class="form-control form-control-user"
-                                                   aria-describedby="emailHelp" placeholder="Xunhaoz">
+                                                   aria-describedby="emailHelp" placeholder="Xunhaoz" id="first_name">
                                         </div>
                                     </div>
                                 </div>
@@ -292,7 +304,7 @@
                                         <label class="text-lg text-primary">密碼</label>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                   aria-describedby="emailHelp" placeholder="********">
+                                                   aria-describedby="emailHelp" placeholder="********" id="password">
                                         </div>
                                     </div>
                                 </div>
@@ -304,19 +316,19 @@
                                 <label>
                                     學生
                                     <input type="radio" class="form-control form-control-user" name="role"
-                                           value="1" checked>
+                                           value="1" id="student">
                                 </label>
                             </div>
                             <div class="col-lg-3 col-sm-3 mb-3 mb-sm-0">
                                 <label>
                                     教師
                                     <input type="radio" class="form-control form-control-user" name="role"
-                                           value="0">
+                                           value="0" id="teacher">
                                 </label>
                             </div>
                             <div class="col-lg-3 col-sm-3 mb-3 mb-sm-0">
                                 <div class="p-3">
-                                    <a href="#" class="btn btn-primary btn-icon-split">
+                                    <a href="#" class="btn btn-primary btn-icon-split" id="submit">
                                 <span class="icon text-white-50">
                                   <i class="fas fa-flag"></i>
                                 </span>
@@ -383,26 +395,71 @@
 
 <!-- Custom scripts for all pages-->
 <script src="js/sb-admin-2.min.js"></script>
+
 <script type="text/javascript">
+
     $(document).ready(function () {
-        var $form = $('#submit');
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) === 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        var $form = $('#logout');
         $form.click(function () {
-            submit();
+            clearCookie("Authentication");
         });
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) === 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+        function clearCookie(name) {
+            setCookie(name, "", -1);
+            window.location.href = "login.html"
+        }
 
         $.ajax({
             type: "GET",
-            url: "user",
-            headers: {"Authentication": getCookie("Authentication")},
+            url: "auth",
             crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
             cache: false,
             dataType: 'json',
             timeout: 5000,
             success: function (response) {
-                if (response.status === 200) {
-                    alert(response.message);
-                } else {
-                    alert(response.message);
+                if (response.status === 403) {
+                    alert(response.message)
+                    window.location.href = "login.html";
                 }
             },
             error: function () {
@@ -410,19 +467,47 @@
             }
         });
 
+        $.ajax({
+            type: "GET",
+            url: "user",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                $("#email").val(response.response.email);
+                $("#first_name").val(response.response.first_name);
+                $("#last_name").val(response.response.last_name);
+                if (response.response.role === 1) {
+                    $("#student").prop("checked", true);
+                } else if (response.response.role === 0) {
+                    $("#teacher").prop("checked", true);
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+
+        var $form = $('#submit');
+        $form.click(function () {
+            submit();
+        });
+
         function submit() {
             var data_string = JSON.stringify({
+                "email": $('#email').val(),
+                "password": $('#password').val(),
                 "first_name": $('#first_name').val(),
                 "last_name": $('#last_name').val(),
-                "email": $('#email').val(),
-                "password": $('#input_password').val(),
-                "repeat_password": $('#repeat_password').val(),
                 "role": $("input[type='radio']:checked").val(),
             });
 
             $.ajax({
-                type: "POST",
+                type: "PUT",
                 url: "user",
+                headers: {"Authentication": getCookie("Authentication")},
                 data: data_string,
                 crossDomain: true,
                 cache: false,
@@ -430,9 +515,9 @@
                 timeout: 5000,
                 success: function (response) {
                     if (response.status === 200) {
-                        alert("註冊成功：" + response.message);
+                        alert(response.message);
                     } else {
-                        alert("註冊失敗：" + response.message);
+                        alert(response.message);
                     }
                 },
                 error: function () {
@@ -440,6 +525,7 @@
                 }
             });
         }
+
     });
 </script>
 </body>

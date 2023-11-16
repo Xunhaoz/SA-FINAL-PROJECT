@@ -125,6 +125,7 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+        this.hashPassword = DigestUtil.sha256Hex(this.salt + this.password);
     }
 
     public String getFirstName() {
@@ -152,4 +153,17 @@ public class User {
         return salt;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", role=" + role +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", hashPassword='" + hashPassword + '\'' +
+                ", salt='" + salt + '\'' +
+                '}';
+    }
 }

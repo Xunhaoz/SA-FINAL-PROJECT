@@ -125,14 +125,15 @@ public class UserHelper {
     public void update(User m) {
         try {
             conn = DBMgr.getConnection();
-            String sql = "Update `final_project`.`user` SET `email` = ?, `password` = ? , `first_name` = ? , `last_name` = ? WHERE  `id` = ?";
+            String sql = "Update `final_project`.`user` SET `email` = ?, `password` = ? , `first_name` = ? , `last_name` = ?, `role` = ? WHERE  `id` = ?";
 
             pres = conn.prepareStatement(sql);
             pres.setString(1, m.getEmail());
             pres.setString(2, m.getHashPassword());
             pres.setString(3, m.getFirstName());
             pres.setString(4, m.getLastName());
-            pres.setInt(5, m.getId());
+            pres.setInt(5, m.getRole());
+            pres.setInt(6, m.getId());
             pres.executeUpdate();
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
