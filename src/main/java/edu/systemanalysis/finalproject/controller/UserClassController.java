@@ -1,10 +1,10 @@
 package edu.systemanalysis.finalproject.controller;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
+import edu.systemanalysis.finalproject.app.*;
 import edu.systemanalysis.finalproject.app.Class;
-import edu.systemanalysis.finalproject.app.ClassHelper;
-import edu.systemanalysis.finalproject.app.UserClass;
-import edu.systemanalysis.finalproject.app.UserClassHelper;
 import edu.systemanalysis.finalproject.tools.JsonReader;
 import org.json.JSONObject;
 
@@ -23,22 +23,20 @@ public class UserClassController extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
-        String studentIdString = request.getHeader("student_id");
+
+        String headerValue = request.getHeader("Authentication");
+        JWT jwt = JWTUtil.parseToken(headerValue);
+        String email = jwt.getPayload("userName").toString();
         String teacherIdString = request.getHeader("teacher_id");
+
         JSONObject resp = new JSONObject();
 
         resp.put("status", 200);
         resp.put("message", "資料獲取成功");
 
-        if (studentIdString != null && !studentIdString.isEmpty()) {
-            int studentId = Integer.parseInt(studentIdString);
-            resp.put("response", uch.selectAllByStudentId(studentId));
-        } else if (teacherIdString != null && !teacherIdString.isEmpty()) {
-            int teacherId = Integer.parseInt(teacherIdString);
-            resp.put("response", uch.selectAllByTeacherId(teacherId));
-
-        } else {
-            resp.put("response", uch.selectAll());
+        if (email != null && !email.isEmpty()) {
+            User u = new User(email);
+            resp.put("response", uch.selectAll(u.getId()));
         }
 
         jsr.response(resp, response);
@@ -48,10 +46,15 @@ public class UserClassController extends HttpServlet {
         JsonReader jsr = new JsonReader(request);
         JSONObject jso = jsr.getObject();
 
-        int studentId = jso.getInt("student_id");
-        int teacherId = jso.getInt("class_id");
+        String headerValue = request.getHeader("Authentication");
+        JWT jwt = JWTUtil.parseToken(headerValue);
+        String email = jwt.getPayload("userName").toString();
+        User u = new User(email);
 
-        UserClass uc = new UserClass(studentId, teacherId);
+        int studentId = u.getId();
+        int classId = jso.getInt("class_id");
+
+        UserClass uc = new UserClass(studentId, classId);
         uc.insert();
 
         JSONObject resp = new JSONObject();

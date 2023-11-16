@@ -1,7 +1,10 @@
 package edu.systemanalysis.finalproject.controller;
 
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
 import edu.systemanalysis.finalproject.app.ClassHelper;
 import edu.systemanalysis.finalproject.app.Class;
+import edu.systemanalysis.finalproject.app.User;
 import edu.systemanalysis.finalproject.tools.JsonReader;
 import org.json.JSONObject;
 
@@ -44,10 +47,14 @@ public class ClassController extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
         JSONObject jso = jsr.getObject();
+        String headerValue = request.getHeader("Authentication");
+        JWT jwt = JWTUtil.parseToken(headerValue);
+        String email = jwt.getPayload("userName").toString();
+        User u = new User(email);
 
-        int teacherId = jso.getInt("teacher_id");
-        String content = jso.getString("content");
-        String topic = jso.getString("topic");
+        int teacherId = u.getId();
+        String content = jso.getString("class_content");
+        String topic = jso.getString("class_topic");
         Timestamp midtermTime = DateUtil.parse(jso.getString("midterm_time")).toTimestamp();
         Timestamp finalTime = DateUtil.parse(jso.getString("final_time")).toTimestamp();
 

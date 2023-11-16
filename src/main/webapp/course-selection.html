@@ -83,10 +83,9 @@
             <div id="collapsePages" class="collapse" aria-labelledby="headingPages"
                  data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Course Pages:</h6>
-                    <a class="collapse-item">課程 1</a>
-                    <a class="collapse-item">課程 2</a>
-                    <a class="collapse-item">課程 3</a>
+                    <div id="item-container">
+                        <h6 class="collapse-header">Course Pages:</h6>
+                    </div>
                     <div class="collapse-divider"></div>
                     <h6 class="collapse-header">Selection Pages:</h6>
                     <a class="collapse-item active" href="course-selection.html">課程選擇</a>
@@ -244,108 +243,54 @@
                 </ul>
 
             </nav>
-            <!-- End of Topbar -->
-
-            <!-- Begin Page Content -->
             <div class="container-fluid">
 
-                <!-- Page Heading -->
                 <h1 class="h3 mb-4 text-gray-800">課程選擇</h1>
                 <div class="row">
-
-                    <div class="col-lg-6">
-
+                    <div class="col-12" id="messages-container">
                         <div class="card shadow mb-4">
                             <!-- Card Header - Accordion -->
                             <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
                                role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                                <h6 class="m-0 font-weight-bold text-primary">大一英文:工程課群</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">新增課程</h6>
                             </a>
                             <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardExample">
+                            <div class="collapse show" id="collapseCardExample" style="">
                                 <div class="card-body">
-                                    初級課程。限英文被分至初級者選修。需另上1小時夜間演習課程，時間:週三第A節，上課教室E1-134、E1-135。不開放初選。
-                                </div>
-                                <div class="p-3">
-                                    <div class="row justify-content-end">
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-success btn-circle ">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        </div>
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-danger btn-circle ">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
+                                    <div class="form-group p-2">
+                                        <label class="text-lg text-primary" for="class_topic">課程標題</label>
+                                        <input type="text" class="form-control form-control-user" id="class_topic"
+                                               aria-describedby="emailHelp" placeholder="請輸入標題">
                                     </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="card shadow mb-4">
-                            <!-- Card Header - Accordion -->
-                            <a href="#collapseCardExample1" class="d-block card-header py-3" data-toggle="collapse"
-                               role="button" aria-expanded="true" aria-controls="collapseCardExample1">
-                                <h6 class="m-0 font-weight-bold text-primary">大一英文:科學課群</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardExample1">
-                                <div class="card-body">
-                                    中級課程。限英文被分至中級者選修。不開放初選。
-                                </div>
-                                <div class="p-3">
-                                    <div class="row justify-content-end">
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-success btn-circle ">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        </div>
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-danger btn-circle ">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
+                                    <div class="form-group p-2">
+                                        <label class="text-lg text-primary" for="class_content">課程描述</label>
+                                        <input type="text" class="form-control form-control-user" id="class_content"
+                                               aria-describedby="emailHelp" placeholder="請輸入課程描述">
+                                    </div>
+                                    <div class="form-group p-2">
+                                        <label class="text-lg text-primary" for="midterm_time">期中考日期</label>
+                                        <input type="date" class="form-control form-control-user" id="midterm_time"
+                                               aria-describedby="emailHelp" placeholder="請輸入期中考日期">
+                                    </div>
+                                    <div class="form-group p-2">
+                                        <label class="text-lg text-primary" for="final_time">期末考日期</label>
+                                        <input type="date" class="form-control form-control-user" id="final_time"
+                                               aria-describedby="emailHelp" placeholder="請輸入期末考日期">
+                                    </div>
+                                    <div class="fa-pull-right p-2 mb-2">
+                                        <a href="#" class="btn btn-secondary btn-icon-split" onclick="submit()">
+                                        <span class="icon text-white-50">
+                                          <i class="fas fa-arrow-right"></i>
+                                        </span>
+                                            <span class="text">新增課程</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div class="card shadow mb-4">
-                            <!-- Card Header - Accordion -->
-                            <a href="#collapseCardExample2" class="d-block card-header py-3" data-toggle="collapse"
-                               role="button" aria-expanded="true" aria-controls="collapseCardExample2">
-                                <h6 class="m-0 font-weight-bold text-primary">大一英文:管理課群</h6>
-                            </a>
-                            <!-- Card Content - Collapse -->
-                            <div class="collapse show" id="collapseCardExample2">
-                                <div class="card-body">
-                                    初級課程。限英文被分至初級者選修。需另上1小時夜間演習課程，時間:週一第9節，上課教室TRA-204、TRA-003。不開放初選。
-                                </div>
-                                <div class="p-3">
-                                    <div class="row justify-content-end">
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-success btn-circle ">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        </div>
-                                        <div class="col-lg-2 col-sm-2 mb-2 mb-sm-0">
-                                            <a href="#" class="btn btn-danger btn-circle ">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
-
                 </div>
             </div>
-            <!-- /.container-fluid -->
 
         </div>
         <!-- End of Main Content -->
@@ -401,6 +346,157 @@
 <!-- Custom scripts for all pages-->
 <script src="js/sb-admin-2.min.js"></script>
 
+<script id="message-template" type="text/template">
+    <div class="card shadow mb-4">
+        <!-- Card Header - Accordion -->
+        <a href="#collapseCardExample{{id}}" class="d-block card-header py-3" data-toggle="collapse"
+           role="button" aria-expanded="true" aria-controls="collapseCardExample">
+            <h6 class="m-0 font-weight-bold text-primary">{{class_topic}}</h6>
+        </a>
+        <!-- Card Content - Collapse -->
+        <div class="collapse show" id="collapseCardExample{{id}}">
+            <div class="card-body">
+                {{class_content}}
+                <div class="fa-pull-right p-2 mb-2">
+                    <a href="#" class="btn btn-light btn-icon-split" onclick="selectCourse({{id}})">
+                    <span class="icon text-gray-600">
+                      <i class="fas fa-arrow-right"></i>
+                    </span>
+                        <span class="text">選擇課程</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="collapse-item-template" type="text/template">
+    <a class="collapse-item">{{class_topic}}</a>
+</script>
+
+<script type="text/javascript">
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    function submit() {
+        var data_string = JSON.stringify({
+            "class_topic": $('#class_topic').val(),
+            "class_content": $('#class_content').val(),
+            "midterm_time": $('#midterm_time').val(),
+            "final_time": $('#final_time').val(),
+        });
+
+        console.log(data_string);
+        $.ajax({
+            type: "POST",
+            url: "class",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            data: data_string,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if (response.status === 200) {
+                    alert(response.message);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+    }
+
+    function selectCourse(id) {
+        $.ajax({
+            type: "POST",
+            url: "user_class",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            data: JSON.stringify({"class_id": id}),
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if (response.status === 200) {
+                    alert(response.message)
+                } else {
+                    alert(response.message)
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "class",
+            crossDomain: true,
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if (response.status === 200) {
+                    var template = $('#message-template').html();
+                    $.each(response.response.data, function (index, item) {
+                        var renderedTemplate = template
+                            .replaceAll('{{class_topic}}', item.topic)
+                            .replaceAll('{{id}}', item.id)
+                            .replaceAll('{{class_content}}', item.content);
+                        $('#messages-container').prepend(renderedTemplate);
+                    });
+
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "user_class",
+            crossDomain: true,
+            headers: {"Authentication": getCookie("Authentication")},
+            cache: false,
+            dataType: 'json',
+            timeout: 5000,
+            success: function (response) {
+                if (response.status === 200) {
+                    var template = $('#collapse-item-template').html();
+                    $.each(response.response.data, function (index, item) {
+                        var renderedTemplate = template
+                            .replaceAll('{{class_topic}}', item.topic)
+                        $('#item-container').append(renderedTemplate);
+                    });
+
+                }
+            },
+            error: function () {
+                alert("無法連線到伺服器！");
+            }
+        });
+    });
+
+
+</script>
 </body>
 
 </html>

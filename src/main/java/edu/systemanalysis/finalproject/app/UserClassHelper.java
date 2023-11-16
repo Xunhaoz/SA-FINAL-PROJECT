@@ -113,7 +113,7 @@ public class UserClassHelper {
 
         try {
             conn = DBMgr.getConnection();
-            String sql = "SELECT * FROM `final_project`.`user_class` uc JOIN `final_project`.`class` c ON uc.class_id = c.id WHERE c.teacher_id = ?;";
+            String sql = "SELECT * FROM `final_project`.`user_class` uc JOIN `final_project`.`class` c ON uc.class_id = c.id WHERE uc.student_id = ?;";
             pres = conn.prepareStatement(sql);
             pres.setInt(1, id);
             rs = pres.executeQuery();
@@ -123,7 +123,6 @@ public class UserClassHelper {
                 int classId = rs.getInt("class_id");
                 Timestamp createTime = rs.getTimestamp("create_time");
                 Timestamp updateTime = rs.getTimestamp("update_time");
-
                 uc = new UserClass(id, studentId, classId, createTime, updateTime);
             }
         } catch (SQLException e) {
@@ -137,25 +136,29 @@ public class UserClassHelper {
         return uc;
     }
 
-    public JSONObject selectAll() {
+    public JSONObject selectAll(int student_id) {
         ResultSet rs = null;
-        UserClass uc = null;
+        Class uc = null;
         JSONArray jsa = new JSONArray();
 
         try {
             conn = DBMgr.getConnection();
-            String sql = "SELECT * FROM `final_project`.`user_class`";
+            String sql = "SELECT * FROM `final_project`.`user_class` uc JOIN `final_project`.`class` c ON uc.class_id = c.id WHERE uc.student_id = ?;";
             pres = conn.prepareStatement(sql);
+            pres.setInt(1, student_id);
+
             rs = pres.executeQuery();
 
             while (rs.next()) {
                 int id = rs.getInt("id");
-                int studentId = rs.getInt("student_id");
-                int classId = rs.getInt("class_id");
+                int teacherId = rs.getInt("teacher_id");
+                String content = rs.getString("content");
+                String topic = rs.getString("topic");
+                Timestamp midtermTime = rs.getTimestamp("midterm_time");
+                Timestamp finalTime = rs.getTimestamp("final_time");
                 Timestamp createTime = rs.getTimestamp("create_time");
-                Timestamp updateTime = rs.getTimestamp("update_time");
 
-                uc = new UserClass(id, studentId, classId, createTime, updateTime);
+                uc = new Class(id, teacherId, content, topic, midtermTime, finalTime, createTime);
                 jsa.put(uc.getData());
             }
         } catch (SQLException e) {
