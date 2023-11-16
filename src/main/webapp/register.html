@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>English Learning System</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link
+            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-primary">
+
+<div class="container">
+
+    <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+            <!-- Nested Row within Card Body -->
+            <div class="row">
+                <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                <div class="col-lg-7">
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">註冊帳號！</h1>
+                        </div>
+                        <form class="user">
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input name="first_name" type="text" class="form-control form-control-user"
+                                           id="first_name" placeholder="名">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input name="last_name" type="text" class="form-control form-control-user"
+                                           id="last_name" placeholder="姓">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control form-control-user" id="email"
+                                       placeholder="Email Address">
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input name="input_password" type="password"
+                                           class="form-control form-control-user" id="input_password"
+                                           placeholder="輸入密碼">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input name="repeat_password" type="password"
+                                           class="form-control form-control-user" id="repeat_password"
+                                           placeholder="確認密碼">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-3 mb-3 mb-sm-0">
+
+                                    <label>
+                                        學生<input type="radio" class="form-control form-control-user" name="role"
+                                                   value="1">
+                                    </label>
+                                </div>
+                                <div class="col-sm-3 mb-3 mb-sm-0">
+                                    <label>
+                                        教師<input type="radio" class="form-control form-control-user" name="role"
+                                                   value="0">
+                                    </label>
+                                </div>
+
+
+                            </div>
+
+                            <a id="submit" href="#" class="btn btn-primary btn-user btn-block">
+                                註冊
+                            </a>
+                        </form>
+                        <hr>
+                        <div class="text-center">
+                            <a class="small" href="forgot-password.html">忘記密碼？</a>
+                        </div>
+                        <div class="text-center">
+                            <a class="small" href="login.html">已經有帳戶了？ 原神啟動！</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var $form = $('#submit');
+        $form.click(function () {
+            submit();
+        });
+
+        function submit() {
+            var data_string = JSON.stringify({
+                "first_name": $('#first_name').val(),
+                "last_name": $('#last_name').val(),
+                "email": $('#email').val(),
+                "password": $('#input_password').val(),
+                "repeat_password": $('#repeat_password').val(),
+                "role": $("input[type='radio']:checked").val(),
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "user",
+                data: data_string,
+                crossDomain: true,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                    if (response.status === 200) {
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+        }
+    });
+</script>
+</body>
+
+</html>

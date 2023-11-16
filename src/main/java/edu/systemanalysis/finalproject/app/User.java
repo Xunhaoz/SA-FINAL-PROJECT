@@ -13,10 +13,6 @@ public class User {
 
     private UserHelper uh = UserHelper.getHelper();
 
-    /**
-     * 建立使用者
-     */
-
     public User(String email, String password, String firstName, String lastName, int role) {
         this.email = email;
         this.password = password;
@@ -27,9 +23,6 @@ public class User {
         this.role = role;
     }
 
-    /**
-     * 完整物件 from sql
-     */
     public User(int id, String email, String hashPassword, String firstName, String lastName, int role, String salt) {
         this.id = id;
         this.email = email;
@@ -40,14 +33,9 @@ public class User {
         this.salt = salt;
     }
 
-    /**
-     * get all user data
-     */
     public User(String email) {
-        User u = uh.getAllByEmail(email);
-        if (u != null) this.copy(u);
+        this.copy(uh.selectOneByEmail(email));
     }
-
 
     public String genSalt() {
         SecureRandom secureRandom = new SecureRandom();
@@ -56,40 +44,6 @@ public class User {
         return HexUtil.encodeHexStr(salt);
     }
 
-    public int getId() {
-        return this.id;
-    }
-
-    public int getRole() {
-        return this.role;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public String getHashPassword() {
-        return this.hashPassword;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getSalt() {
-        if (this.salt.isEmpty()) {
-            this.copy(uh.getAllByEmail(this.email));
-        }
-        return this.salt;
-    }
 
     public boolean checkAttrEmpty() {
         if ((this.role != 0 && this.role != 1) || this.email.isEmpty() || this.password.isEmpty() || this.firstName.isEmpty() || this.lastName.isEmpty()) {
@@ -98,61 +52,29 @@ public class User {
         return false;
     }
 
-    public boolean checkEmailDuplicate() {
-        return uh.checkEmailDuplicate(this.email);
-    }
-
     public boolean checkEmailExist() {
         return uh.checkEmailExists(this.email);
     }
 
-    public boolean checkPasswordCorrect(String password) {
-        return this.hashPassword.equals(DigestUtil.sha256Hex(this.salt + password));
-    }
+    public boolean checkPasswordCorrect(String password) {return this.hashPassword.equals(DigestUtil.sha256Hex(this.salt + password));}
 
     public void create() {
         uh.create(this);
-        this.copy(uh.getAllByEmail(this.email));
+        this.copy(uh.selectOneByEmail(this.email));
     }
 
     public void update() {
         uh.update(this);
-        this.copy(uh.getAllByEmail(this.email));
+        this.copy(uh.selectOneByEmail(this.email));
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void updateRandomPassword() {
+        this.password = genSalt();
+        this.hashPassword = DigestUtil.sha256Hex(this.salt + this.password);
+        this.uh.update(this);
     }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setHashPassword(String hashPassword) {
-        this.hashPassword = hashPassword;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
     public void copy(User u) {
+        if (u == null) return;
         this.email = u.email;
         this.salt = u.salt;
         this.hashPassword = u.hashPassword;
@@ -161,13 +83,6 @@ public class User {
         this.password = u.password;
         this.id = u.id;
     }
-
-    public void updateRandomPassword() {
-        this.password = getSalt();
-        this.hashPassword = DigestUtil.sha256Hex(this.salt + password);
-        this.uh.update(this);
-    }
-
     public JSONObject getData() {
         JSONObject jso = new JSONObject();
         jso.put("id", getId());
@@ -180,8 +95,61 @@ public class User {
         return jso;
     }
 
-    @Override
-    public String toString() {
-        return "User{" + "id=" + id + ", email='" + email + '\'' + ", password='" + password + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", role=" + role + '}';
+    public int getId() {
+        return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getHashPassword() {
+        return hashPassword;
+    }
+
+
+    public String getSalt() {
+        return salt;
+    }
+
 }

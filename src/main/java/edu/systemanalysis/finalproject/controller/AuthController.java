@@ -46,7 +46,6 @@ public class AuthController extends HttpServlet {
         jsr.response(resp, response);
     }
 
-
     /**
      * 登入驗證
      */
@@ -65,13 +64,11 @@ public class AuthController extends HttpServlet {
             jsr.response(resp, response);
             return;
         }
-
         if (!u.checkPasswordCorrect(password)) {
             String resp = "{\"status\": 401, \"message\": '密碼不正確', 'response': ''}";
             jsr.response(resp, response);
             return;
         }
-
         if (remember) {
             String salt = u.getSalt();
             DateTime now = DateTime.now();
@@ -94,10 +91,9 @@ public class AuthController extends HttpServlet {
         LoginLog ll = new LoginLog(ip, country, city, operatingSystem, u.getId());
         ll.create();
 
-        String resp = "{\"status\": 200, \"message\": '登入成功', 'response': ''}";
+        String resp = "{\"status\": 200, \"message\": \"登入成功\", \"response\": \"\"}";
         jsr.response(resp, response);
     }
-
 
     public void destroy() {
     }

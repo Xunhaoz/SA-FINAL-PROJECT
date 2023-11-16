@@ -23,29 +23,6 @@ public class UserHelper {
         return mh;
     }
 
-    public boolean checkEmailDuplicate(String email) {
-        int row = -1;
-        ResultSet rs = null;
-        try {
-            conn = DBMgr.getConnection();
-            String sql = "SELECT count(*) FROM `final_project`.`user` WHERE `email` = ?";
-            pres = conn.prepareStatement(sql);
-            pres.setString(1, email);
-            rs = pres.executeQuery();
-            rs.next();
-            row = rs.getInt("count(*)");
-            System.out.print(row);
-
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBMgr.close(rs, pres, conn);
-        }
-        return row != 0;
-    }
-
     public void create(User m) {
         try {
             conn = DBMgr.getConnection();
@@ -67,8 +44,7 @@ public class UserHelper {
         }
     }
 
-
-    public User getAllByEmail(String email) {
+    public User selectOneByEmail(String email) {
         ResultSet rs = null;
         User u = null;
 
@@ -97,16 +73,25 @@ public class UserHelper {
         return u;
     }
 
-    public boolean checkEmailExists(String email) {
+    public User selectOneById(int id) {
         ResultSet rs = null;
+        User u = null;
+
         try {
             conn = DBMgr.getConnection();
-            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
+            String sql = "SELECT * FROM `final_project`.`user` WHERE `id` = ? LIMIT 1";
             pres = conn.prepareStatement(sql);
-            pres.setString(1, email);
+            pres.setInt(1, id);
             rs = pres.executeQuery();
-            return rs.next();
-
+            if (rs.next()) {
+                String email = rs.getString("email");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String hashPassword = rs.getString("password");
+                int role = rs.getInt("role");
+                String salt = rs.getString("salt");
+                u = new User(id, email, hashPassword, firstName, lastName, role, salt);
+            }
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
         } catch (Exception e) {
@@ -114,7 +99,27 @@ public class UserHelper {
         } finally {
             DBMgr.close(rs, pres, conn);
         }
-        return false;
+        return u;
+    }
+
+    public boolean checkEmailExists(String email) {
+        ResultSet rs = null;
+        boolean exists = false;
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
+            pres = conn.prepareStatement(sql);
+            pres.setString(1, email);
+            rs = pres.executeQuery();
+            exists = rs.next();
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBMgr.close(rs, pres, conn);
+        }
+        return exists;
     }
 
     public void update(User m) {
@@ -124,19 +129,16 @@ public class UserHelper {
 
             pres = conn.prepareStatement(sql);
             pres.setString(1, m.getEmail());
-            pres.setString(2, m.getPassword());
+            pres.setString(2, m.getHashPassword());
             pres.setString(3, m.getFirstName());
             pres.setString(4, m.getLastName());
             pres.setInt(5, m.getId());
             pres.executeUpdate();
         } catch (SQLException e) {
-            /** 印出JDBC SQL指令錯誤 **/
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
         } catch (Exception e) {
-            /** 若錯誤則印出錯誤訊息 */
             e.printStackTrace();
         } finally {
-            /** 關閉連線並釋放所有資料庫相關之資源 **/
             DBMgr.close(pres, conn);
         }
 
