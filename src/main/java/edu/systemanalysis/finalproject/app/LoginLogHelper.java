@@ -2,10 +2,9 @@ package edu.systemanalysis.finalproject.app;
 
 import edu.systemanalysis.finalproject.util.DBMgr;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.sql.Timestamp;
+import org.json.*;
 
 public class LoginLogHelper {
     private LoginLogHelper() {
@@ -39,5 +38,41 @@ public class LoginLogHelper {
         } finally {
             DBMgr.close(pres, conn);
         }
+    }
+
+    public JSONObject getAll(int userId) {
+        LoginLog ll = null;
+        JSONArray jsa = new JSONArray();
+
+        ResultSet rs = null;
+
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "SELECT * FROM `final_project`.`login_log` WHERE `user_id` = ?";
+            pres = conn.prepareStatement(sql);
+            pres.setInt(1, userId);
+            rs = pres.executeQuery();
+
+            while(rs.next()) {
+                String ip = rs.getString("ip");
+                String country = rs.getString("country");
+                String city = rs.getString("city");
+                String operatingSystem = rs.getString("operating_system");
+                Timestamp createTime = rs.getTimestamp("create_time");
+
+                ll = new LoginLog(ip, country, city, operatingSystem, createTime);
+                jsa.put(ll.getData());
+            }
+
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBMgr.close(rs, pres, conn);
+        }
+        JSONObject response = new JSONObject();
+        response.put("data", jsa);
+        return response;
     }
 }

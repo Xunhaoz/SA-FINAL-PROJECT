@@ -2,6 +2,8 @@ package edu.systemanalysis.finalproject.app;
 
 import cn.hutool.crypto.digest.DigestUtil;
 
+import org.json.*;
+
 import java.sql.Timestamp;
 
 public class LoginLog {
@@ -21,6 +23,19 @@ public class LoginLog {
         this.city = city;
         this.operatingSystem = operatingSystem;
         this.userId = userId;
+    }
+
+    public LoginLog(String ip, String country, String city, String operatingSystem, Timestamp createTime) {
+        this.ip = ip;
+        this.country = country;
+        this.city = city;
+        this.operatingSystem = operatingSystem;
+        this.createTime = createTime;
+    }
+
+    public LoginLog(int userId) {
+        this.userId = userId;
+
     }
 
     public void create() {
@@ -53,5 +68,15 @@ public class LoginLog {
 
     public int getUserId() {
         return userId;
+    }
+
+    public JSONObject getData() {
+        JSONObject jso = new JSONObject();
+        jso.put("ip", getIp());
+        jso.put("country", getCountry());
+        jso.put("city", getCity());
+        jso.put("create_time", getCreateTime());
+        jso.put("operating_system", getOperatingSystem());
+        return jso;
     }
 }

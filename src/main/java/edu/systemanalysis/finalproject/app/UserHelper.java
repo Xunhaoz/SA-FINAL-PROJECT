@@ -7,7 +7,6 @@ import edu.systemanalysis.finalproject.tools.JsonReader;
 import edu.systemanalysis.finalproject.app.User;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 public class UserHelper {
     private UserHelper() {
@@ -68,9 +67,10 @@ public class UserHelper {
         }
     }
 
-    public int getIDByEmail(String email) {
+
+    public User getAllByEmail(String email) {
         ResultSet rs = null;
-        int id = -1;
+        User u = null;
 
         try {
             conn = DBMgr.getConnection();
@@ -79,7 +79,13 @@ public class UserHelper {
             pres.setString(1, email);
             rs = pres.executeQuery();
             if (rs.next()) {
-                id = rs.getInt("id");
+                int id = rs.getInt("id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String hashPassword = rs.getString("password");
+                int role = rs.getInt("role");
+                String salt = rs.getString("salt");
+                u = new User(id, email, hashPassword, firstName, lastName, role, salt);
             }
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
@@ -88,53 +94,7 @@ public class UserHelper {
         } finally {
             DBMgr.close(rs, pres, conn);
         }
-        return id;
-    }
-
-    public String getSaltByEmail(String email) {
-        ResultSet rs = null;
-        String salt = "";
-
-        try {
-            conn = DBMgr.getConnection();
-            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
-            pres = conn.prepareStatement(sql);
-            pres.setString(1, email);
-            rs = pres.executeQuery();
-            if (rs.next()) {
-                salt = rs.getString("salt");
-            }
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBMgr.close(rs, pres, conn);
-        }
-        return salt;
-    }
-
-    public String getHashPasswordByEmail(String email) {
-        ResultSet rs = null;
-        String hashPassword = "";
-
-        try {
-            conn = DBMgr.getConnection();
-            String sql = "SELECT * FROM `final_project`.`user` WHERE `email` = ? LIMIT 1";
-            pres = conn.prepareStatement(sql);
-            pres.setString(1, email);
-            rs = pres.executeQuery();
-            if (rs.next()) {
-                hashPassword = rs.getString("password");
-            }
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBMgr.close(rs, pres, conn);
-        }
-        return hashPassword;
+        return u;
     }
 
     public boolean checkEmailExists(String email) {
@@ -155,5 +115,30 @@ public class UserHelper {
             DBMgr.close(rs, pres, conn);
         }
         return false;
+    }
+
+    public void update(User m) {
+        try {
+            conn = DBMgr.getConnection();
+            String sql = "Update `final_project`.`user` SET `email` = ?, `password` = ? , `first_name` = ? , `last_name` = ? WHERE  `id` = ?";
+
+            pres = conn.prepareStatement(sql);
+            pres.setString(1, m.getEmail());
+            pres.setString(2, m.getPassword());
+            pres.setString(3, m.getFirstName());
+            pres.setString(4, m.getLastName());
+            pres.setInt(5, m.getId());
+            pres.executeUpdate();
+        } catch (SQLException e) {
+            /** 印出JDBC SQL指令錯誤 **/
+            System.err.format("SQL State: %s\n%s\n%s", e.getErrorCode(), e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            /** 若錯誤則印出錯誤訊息 */
+            e.printStackTrace();
+        } finally {
+            /** 關閉連線並釋放所有資料庫相關之資源 **/
+            DBMgr.close(pres, conn);
+        }
+
     }
 }

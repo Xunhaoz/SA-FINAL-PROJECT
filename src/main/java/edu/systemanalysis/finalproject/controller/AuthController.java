@@ -12,14 +12,18 @@ import cn.hutool.jwt.*;
 import org.json.*;
 import edu.systemanalysis.finalproject.app.User;
 import edu.systemanalysis.finalproject.app.LoginLog;
+import edu.systemanalysis.finalproject.app.LoginLogHelper;
 import edu.systemanalysis.finalproject.tools.JsonReader;
 
 
 @WebServlet(name = "auth", value = "/auth")
 public class AuthController extends HttpServlet {
+    LoginLogHelper llh = LoginLogHelper.getHelper();
+
     public void init() {
 
     }
+
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
@@ -35,13 +39,16 @@ public class AuthController extends HttpServlet {
             return;
         }
 
-        String resp = "{\"status\": 200, \"message\": \"jwt 登入成功\", \"response\": \"\"}";
+        JSONObject resp = new JSONObject();
+        resp.put("status", 200);
+        resp.put("message", "jwt 登入成功");
+        resp.put("response", llh.getAll(u.getId()));
         jsr.response(resp, response);
     }
 
 
     /**
-     * 快速登入驗證
+     * 登入驗證
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonReader jsr = new JsonReader(request);
@@ -51,7 +58,7 @@ public class AuthController extends HttpServlet {
         String password = jso.getString("password");
         boolean remember = jso.getBoolean("remember");
 
-        User u = new User(email, password);
+        User u = new User(email);
 
         if (!u.checkEmailExist()) {
             String resp = "{\"status\": 401, \"message\": '帳號不存在', 'response': ''}";
@@ -59,7 +66,7 @@ public class AuthController extends HttpServlet {
             return;
         }
 
-        if (!u.checkPasswordCorrect()) {
+        if (!u.checkPasswordCorrect(password)) {
             String resp = "{\"status\": 401, \"message\": '密碼不正確', 'response': ''}";
             jsr.response(resp, response);
             return;
